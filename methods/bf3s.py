@@ -2,6 +2,7 @@ import backbone
 import torch
 import torch.nn as nn
 import numpy as np
+from torch.autograd import Variable
 from methods.meta_template import MetaTemplate
 
 def apply_2d_rotation(input_tensor, rotation):
@@ -31,26 +32,43 @@ def apply_2d_rotation(input_tensor, rotation):
         raise ValueError(
             "rotation should be 0, 90, 180, or 270 degrees; input value {}".format(rotation)
         )
+def tranform_shape(x, n_support):
+    ways = x.size(0)
+    n_views = x.size(1)
+    shots = n_support
+    query_shots = n_views - shots
+    x_support = x[:, :shots].reshape((ways * shots, *x.shape[-3:]))
+    x_support = Variable(x_support.cuda())
+    x_query = x[:, shots:].reshape((ways * query_shots, *x.shape[-3:]))
+    x_query = Variable(x_query.cuda())
+
+    # Extract features
+    x_both = torch.cat([x_support, x_query], 0)
+    return x_both
 
 class Selfsupervision_rot(nn.Module):
-    def __init__(self, model_func, num_classes=4):
+    def __init__(self, model_func, n_support,num_classes=4):
         super(Selfsupervision_rot, self).__init__()
 
         assert model_func is not None
         self.feature_extractor = model_func().cuda()
         self.classifier = backbone.distLinear(self.feature_extractor.final_feat_dim, num_classes).cuda()
         self.num_classes = num_classes
+        self.n_support = n_support
 
     def forward(self, x):
-        x_90 = apply_2d_rotation(x,90)
-        x_180 = apply_2d_rotation(x, 180)
-        x_270 = apply_2d_rotation(x, 270)
+        n_support = self.n_support
+        x = tranform_shape(x, n_support)
+        x_90 = tranform_shape(apply_2d_rotation(x, 90), n_support)
+        x_180 = tranform_shape(apply_2d_rotation(x, 180), n_support)
+        x_270 = tranform_shape(apply_2d_rotation(x, 270), n_support)
         x = torch.cat([x, x_90, x_180, x_270], dim=0)
         out = self.feature_extractor.forward(x)
         scores = self.classifier.forward(out)
         return scores
 
-    def loss(self, x):
+
+def loss(self, x):
 
         loss_function = nn.CrossEntropyLoss()
         loss_function = loss_function.cuda()
@@ -75,10 +93,12 @@ class Bf3s(MetaTemplate):
         self.num_class = num_class
         self.loss_fn = nn.CrossEntropyLoss().cuda()
         self.alpha = alpha
-        self.self_supervision_net = Selfsupervision_rot(model_func).cuda()
+        self.self_supervision_net = Selfsupervision_rot(model_func, n_support).cuda()
 
     def set_forward(self, x, is_feature=True):
-        scores_fewshot = self.feature_extractor.forward(x)
+
+        scores_fewshot = self.feature_extractor(tranform_shape(x, self.n_support))
+
         scores_fewshot = self.classifier.forward(scores_fewshot)
 
         socres_selfsupervision = self.self_supervision_net(x)

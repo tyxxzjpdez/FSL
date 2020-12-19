@@ -120,6 +120,7 @@ for dataset in datasets:
             if (epoch % save_freq == 0) or (epoch == stop_epoch - 1):
                 outfile = os.path.join(checkpoint_dir, '{:d}.tar'.format(epoch))
                 torch.save({'epoch': epoch, 'state': model.state_dict()}, outfile)
+            assert False
     # endregion
 
     # region test
