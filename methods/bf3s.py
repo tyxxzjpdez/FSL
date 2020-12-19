@@ -61,8 +61,7 @@ class Selfsupervision_rot(nn.Module):
     def forward(self, x):
         n_support = self.n_support
         print(x.shape)
-        x = tranform_shape(x, n_support)
-
+        tx = tranform_shape(x, n_support)
 
         print(apply_2d_rotation(x, 90).shape)
         assert False
@@ -70,7 +69,7 @@ class Selfsupervision_rot(nn.Module):
         x_90 = tranform_shape(apply_2d_rotation(x, 90), n_support)
         x_180 = tranform_shape(apply_2d_rotation(x, 180), n_support)
         x_270 = tranform_shape(apply_2d_rotation(x, 270), n_support)
-        x = torch.cat([x, x_90, x_180, x_270], dim=0)
+        x = torch.cat([tx, x_90, x_180, x_270], dim=0)
         out = self.feature_extractor.forward(x)
         scores = self.classifier.forward(out)
         return scores
