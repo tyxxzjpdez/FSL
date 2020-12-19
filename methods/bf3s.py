@@ -34,12 +34,11 @@ def apply_2d_rotation(input_tensor, rotation):
         )
 
 class Selfsupervision_rot(nn.Module):
-    def __init__(self, model_func=model_dict["Conv4"], num_classes=4):
+    def __init__(self, model_func, num_classes=4):
         super(Selfsupervision_rot, self).__init__()
 
-        assert model_func == model_dict["Conv4"], "Only support Conv4"
-        if model_func == model_dict["Conv4"]:
-            self.feature_extractor = model_func().cuda()
+        assert model_func is not None
+        self.feature_extractor = model_func().cuda()
         self.classifier = backbone.distLinear(self.feature_extractor.final_feat_dim, num_classes).cuda()
         self.num_classes = num_classes
 
@@ -77,7 +76,7 @@ class Bf3s(MetaTemplate):
         self.num_class = num_class
         self.loss_fn = nn.CrossEntropyLoss().cuda()
         self.alpha = alpha
-        self.self_supervision_net = Selfsupervision_rot().cuda()
+        self.self_supervision_net = Selfsupervision_rot(model_func).cuda()
 
     def set_forward(self, x, is_feature):
         scores_fewshot = self.feature_extractor.forward(x)
