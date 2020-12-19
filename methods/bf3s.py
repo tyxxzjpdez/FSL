@@ -2,6 +2,7 @@ import backbone
 import torch
 import torch.nn as nn
 import numpy as np
+from utils import model_dict
 from methods.meta_template import MetaTemplate
 
 def apply_2d_rotation(input_tensor, rotation):
@@ -33,11 +34,11 @@ def apply_2d_rotation(input_tensor, rotation):
         )
 
 class Selfsupervision_rot(nn.Module):
-    def __init__(self, model_func ='Conv4', num_classes=4):
+    def __init__(self, model_func=model_dict["Conv4"], num_classes=4):
         super(Selfsupervision_rot, self).__init__()
 
-        assert model_func == 'Conv4', "Only support Conv4"
-        if model_func == 'Conv4':
+        assert model_func == model_dict["Conv4"], "Only support Conv4"
+        if model_func == model_dict["Conv4"]:
             self.feature_extractor = model_func().cuda()
         self.classifier = backbone.distLinear(self.feature_extractor.final_feat_dim, num_classes).cuda()
         self.num_classes = num_classes
