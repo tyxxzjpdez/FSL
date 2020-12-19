@@ -55,7 +55,7 @@ def get_model(algorithm, model_name, dataset, n_way, n_shot, adaptation):
     return model
 
 # just test cifar
-datasets = ['cifar']  # CUB/omniglot/miniImagenet/cross/cross_char/cifar
+# datasets = ['cifar']  # CUB/omniglot/miniImagenet/cross/cross_char/cifar
 
 for dataset in datasets:
     print(dataset)
