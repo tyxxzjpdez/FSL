@@ -77,7 +77,7 @@ class Bf3s(MetaTemplate):
         self.alpha = alpha
         self.self_supervision_net = Selfsupervision_rot(model_func).cuda()
 
-    def set_forward(self, x, is_feature):
+    def set_forward(self, x, is_feature=True):
         scores_fewshot = self.feature_extractor.forward(x)
         scores_fewshot = self.classifier.forward(scores_fewshot)
 
