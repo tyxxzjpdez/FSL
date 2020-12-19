@@ -48,9 +48,6 @@ def get_model(algorithm, model_name, dataset, n_way, n_shot, adaptation):
             model.task_update_num = 1
             model.train_lr = 0.1
     elif algorithm == "bf3s":
-        print("model_name =",model_name)
-        print("dist=", model_dict[model_name])
-        assert False
         model = Bf3s(model_dict[model_name], n_way=n_way, n_support=n_shot, num_class=num_classes,
                          loss_type='dist')
     else:
