@@ -109,7 +109,7 @@ class Bf3s(MetaTemplate):
 
     def set_forward_loss(self, x):
         scores_fewshot, scores_selfsupervision = self.set_forward(x)
-        y = torch.from_numpy(np.repeat(range(self.n_way), self.n_query)).long()
+        y = torch.from_numpy(np.repeat(range(self.n_way), self.n_query+self.n_support)).long()
         return self.loss_fn(scores_fewshot, y.cuda()) + \
                self.alpha * self.self_supervision_net.loss(scores_selfsupervision)
 
@@ -146,7 +146,7 @@ class Bf3s(MetaTemplate):
             # ---------------------------
             # TODO temporally replaced the call to correct() with the code
             # correct_this, count_this = self.correct(x)
-            scores = self.set_forward(x)
+            scores = self.set_forward(x)[0][self.n_way * self.n_query:]
             y_query = np.repeat(range(self.n_way), self.n_query)  # [0 0 0 1 1 1 2 2 2 3 3 3 4 4 4]
             topk_scores, topk_labels = scores.data.topk(1, 1, True, True)
             topk_ind = topk_labels.cpu().numpy()
