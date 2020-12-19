@@ -13,6 +13,8 @@ def apply_2d_rotation(input_tensor, rotation):
     """
     assert input_tensor.dim() >= 2
 
+    shape = input_tensor.shape
+
     height_dim = input_tensor.dim() - 2
     width_dim = height_dim + 1
 
@@ -21,13 +23,13 @@ def apply_2d_rotation(input_tensor, rotation):
     spatial_transpose = lambda x: torch.transpose(x, height_dim, width_dim)
 
     if rotation == 0:  # 0 degrees rotation
-        return input_tensor
+        return input_tensor.view(shape)
     elif rotation == 90:  # 90 degrees rotation
-        return flip_upside_down(spatial_transpose(input_tensor))
+        return flip_upside_down(spatial_transpose(input_tensor)).view(shape)
     elif rotation == 180:  # 90 degrees rotation
-        return flip_left_right(flip_upside_down(input_tensor))
+        return flip_left_right(flip_upside_down(input_tensor)).view(shape)
     elif rotation == 270:  # 270 degrees rotation / or -90
-        return spatial_transpose(flip_upside_down(input_tensor))
+        return spatial_transpose(flip_upside_down(input_tensor)).view(shape)
     else:
         raise ValueError(
             "rotation should be 0, 90, 180, or 270 degrees; input value {}".format(rotation)
