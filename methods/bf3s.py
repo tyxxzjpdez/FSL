@@ -2,7 +2,7 @@ import backbone
 import torch
 import torch.nn as nn
 import numpy as np
-from utils import model_dict
+from ..utils import model_dict
 from methods.meta_template import MetaTemplate
 
 def apply_2d_rotation(input_tensor, rotation):
