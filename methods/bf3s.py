@@ -71,7 +71,7 @@ class Selfsupervision_rot(nn.Module):
         return scores
 
 
-def loss(self, x):
+    def loss(self, x):
 
         loss_function = nn.CrossEntropyLoss()
         loss_function = loss_function.cuda()
