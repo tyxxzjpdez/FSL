@@ -73,7 +73,7 @@ for dataset in datasets:
     if_train = True
     if_test = True
     adaptation = False
-    num_workers = 0
+    num_workers = 8
     # endregion
 
     image_size = get_image_size(model_name=model_name, dataset=dataset)
@@ -120,7 +120,7 @@ for dataset in datasets:
             if (epoch % save_freq == 0) or (epoch == stop_epoch - 1):
                 outfile = os.path.join(checkpoint_dir, '{:d}.tar'.format(epoch))
                 torch.save({'epoch': epoch, 'state': model.state_dict()}, outfile)
-            assert False
+            #assert False
     # endregion
 
     # region test
