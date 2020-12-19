@@ -5,6 +5,7 @@ import os
 import random
 import glob
 from methods.baseline import Baseline
+from methods.bf3s import Bf3s
 from methods.protonet import ProtoNet
 from methods.matchingnet import MatchingNet
 from methods.relationnet import RelationNet

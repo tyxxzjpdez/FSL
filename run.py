@@ -1,5 +1,5 @@
 from utils import *
-from methods.gpshot import GPShot
+#from methods.gpshot import GPShot
 
 datasets = ['omniglot', 'cross_char', 'CUB', 'miniImagenet', 'cross',
             'cifar']  # CUB/omniglot/miniImagenet/cross/cross_char/cifar
@@ -23,8 +23,8 @@ def get_model(algorithm, model_name, dataset, n_way, n_shot, adaptation):
     elif algorithm == 'matchingnet':
         model = MatchingNet(model_dict[model_name], n_way=n_way, n_support=n_shot, adaptation=adaptation,
                             use_cuda=use_cuda)
-    elif algorithm == 'gpshot':
-        model = GPShot(model_dict[model_name], n_way=n_way, n_support=n_shot)
+    #elif algorithm == 'gpshot':
+    #    model = GPShot(model_dict[model_name], n_way=n_way, n_support=n_shot)
     elif algorithm in ['relationnet', 'relationnet_softmax']:
         if model_name == 'Conv4':
             feature_model = backbone.Conv4NP
@@ -48,7 +48,7 @@ def get_model(algorithm, model_name, dataset, n_way, n_shot, adaptation):
             model.task_update_num = 1
             model.train_lr = 0.1
     elif algorithm == "bf3s":
-        model = Baseline(model_dict[model_name], n_way=n_way, n_support=n_shot, num_class=num_classes,
+        model = Bf3s(model_dict[model_name], n_way=n_way, n_support=n_shot, num_class=num_classes,
                          loss_type='dist')
     else:
         raise ValueError('Unknown algorithm')
