@@ -98,7 +98,7 @@ class Bf3s(MetaTemplate):
         self.alpha = alpha
         self.self_supervision_net = Selfsupervision_rot(model_func, n_support).cuda()
 
-    def set_forward(self, x, is_feature=True):
+    def set_forward(self, x, is_feature=False):
 
         scores_fewshot = self.feature_extractor(tranform_shape(x, self.n_support))
 
@@ -146,7 +146,15 @@ class Bf3s(MetaTemplate):
             # ---------------------------
             # TODO temporally replaced the call to correct() with the code
             # correct_this, count_this = self.correct(x)
-            scores = self.set_forward(x)[0][self.n_way * self.n_query:]
+            z_support, z_query = self.parse_feature(x)# [N, S, d], [N, Q, d]
+
+            eps = 0.00001
+            prototype_weight = z_support / (torch.norm(z_support.mean(dim=1), p=2, dim=1, keepdim=True).expand_as(z_support) + eps)
+            prototype_weight = prototype_weight.transpose(0,1)
+            z_query = z_query.view(-1, z_query.size(-1)) # [N*Q,d]
+            z_query = z_query / (torch.norm(z_query.mean(dim=1), p=2, dim=1, keepdim=True).expand_as(z_support) + eps)
+            scores = torch.mm(z_query, prototype_weight) * self.classifier.scale_factor # [N*Q,d] * [d, N] -> [N*Q, N]
+
             y_query = np.repeat(range(self.n_way), self.n_query)  # [0 0 0 1 1 1 2 2 2 3 3 3 4 4 4]
             topk_scores, topk_labels = scores.data.topk(1, 1, True, True)
             topk_ind = topk_labels.cpu().numpy()
@@ -159,4 +167,6 @@ class Bf3s(MetaTemplate):
         acc_mean = np.mean(acc_all)
         acc_std = np.std(acc_all)
         print('%d Test Acc = %4.2f%% +- %4.2f%%' % (iter_num, acc_mean, 1.96 * acc_std / np.sqrt(iter_num)))
+        if return_std:
+            return acc_mean, acc_std
         return acc_mean
