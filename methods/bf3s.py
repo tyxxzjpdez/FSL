@@ -99,9 +99,7 @@ class Bf3s(MetaTemplate):
         self.self_supervision_net = Selfsupervision_rot(model_func, n_support).cuda()
 
     def set_forward(self, x, is_feature=False):
-        print("123")
-        print(tranform_shape(x, self.n_support).shape)
-        print("123")
+
         scores_fewshot = self.feature_extractor(tranform_shape(x, self.n_support))
 
         scores_fewshot = self.classifier.forward(scores_fewshot)
@@ -148,7 +146,9 @@ class Bf3s(MetaTemplate):
             # ---------------------------
             # TODO temporally replaced the call to correct() with the code
             # correct_this, count_this = self.correct(x)
-            z_support, z_query = self.parse_feature(x)# [N, S, d], [N, Q, d]
+            x = self.feature_extractor(tranform_shape(x,self.n_support)).view(x.shape)
+            z_support, z_query = x[:,:self.n_support], x[:,self.n_support:]# [N, S, d], [N, Q, d]
+            assert False
 
             eps = 0.00001
             prototype_weight = z_support / (torch.norm(z_support.mean(dim=1), p=2, dim=1, keepdim=True).expand_as(z_support) + eps)

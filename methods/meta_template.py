@@ -35,10 +35,7 @@ class MetaTemplate(nn.Module):
     def parse_feature(self, x, is_adaptation=False):
         x = x.requires_grad_(True)
         x = x.reshape(self.n_way * (self.n_support + self.n_query), *x.size()[2:])
-        print(x.shape)
         z_all = self.feature_extractor(x)
-        print(x.shape)
-        assert False
         z_all = z_all.reshape(self.n_way, self.n_support + self.n_query, *z_all.shape[1:])  # [N, S+Q, d]
         if is_adaptation:
             z_all = z_all.detach()
