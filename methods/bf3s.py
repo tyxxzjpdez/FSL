@@ -146,7 +146,7 @@ class Bf3s(MetaTemplate):
             # ---------------------------
             # TODO temporally replaced the call to correct() with the code
             # correct_this, count_this = self.correct(x)
-            x = self.feature_extractor(tranform_shape(x,self.n_support)).view(x.shape)
+            x = self.feature_extractor(tranform_shape(x,self.n_support)).view(*x.shape[:2],-1)
             z_support, z_query = x[:,:self.n_support], x[:,self.n_support:]# [N, S, d], [N, Q, d]
             assert False
 
