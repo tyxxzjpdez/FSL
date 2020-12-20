@@ -148,7 +148,7 @@ class Bf3s(MetaTemplate):
             # correct_this, count_this = self.correct(x)
             x = self.feature_extractor(tranform_shape(x,self.n_support)).view(*x.shape[:2],-1)
             z_support, z_query = x[:,:self.n_support], x[:,self.n_support:]# [N, S, d], [N, Q, d]
-            assert False
+            #assert False
 
             eps = 0.00001
             prototype_weight = z_support / (torch.norm(z_support.mean(dim=1), p=2, dim=1, keepdim=True).expand_as(z_support) + eps)
