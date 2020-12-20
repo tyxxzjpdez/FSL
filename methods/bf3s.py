@@ -151,7 +151,8 @@ class Bf3s(MetaTemplate):
             #assert False
 
             eps = 0.00001
-            prototype_weight = z_support / (torch.norm(z_support.mean(dim=1), p=2, dim=1, keepdim=True).expand_as(z_support) + eps)
+            z_support = z_support.mean(dim=1)
+            prototype_weight = z_support / (torch.norm(z_support, p=2, dim=1, keepdim=True).expand_as(z_support) + eps)
             prototype_weight = prototype_weight.transpose(0,1)
             z_query = z_query.reshape(z_query.shape[0] * z_query.shape[1], -1) # [N*Q,d]
             z_query = z_query / (torch.norm(z_query, p=2, dim=1, keepdim=True).expand_as(z_query) + eps)
