@@ -36,8 +36,9 @@ class MetaTemplate(nn.Module):
         x = x.requires_grad_(True)
         x = x.reshape(self.n_way * (self.n_support + self.n_query), *x.size()[2:])
         print(x.shape)
-        assert False
         z_all = self.feature_extractor.forward(x)
+        print(x.shape)
+        assert False
         z_all = z_all.reshape(self.n_way, self.n_support + self.n_query, *z_all.shape[1:])  # [N, S+Q, d]
         if is_adaptation:
             z_all = z_all.detach()
