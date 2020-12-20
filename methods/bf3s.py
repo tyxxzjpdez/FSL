@@ -111,7 +111,7 @@ class Bf3s(MetaTemplate):
         scores_fewshot, scores_selfsupervision = self.set_forward(x)
         y = torch.from_numpy(np.repeat(range(self.n_way), self.n_query+self.n_support)).long()
         return self.loss_fn(scores_fewshot, y.cuda()) + \
-               self.alpha * self.self_supervision_net.loss(scores_selfsupervision)
+               0 * self.self_supervision_net.loss(scores_selfsupervision)
 
     def train_loop(self, epoch, train_loader, optimizer):
         print_freq = 10
@@ -156,7 +156,7 @@ class Bf3s(MetaTemplate):
             prototype_weight = prototype_weight.transpose(0,1)
             z_query = z_query.reshape(z_query.shape[0] * z_query.shape[1], -1) # [N*Q,d]
             z_query = z_query / (torch.norm(z_query, p=2, dim=1, keepdim=True).expand_as(z_query) + eps)
-            
+
             scores = torch.mm(z_query, prototype_weight) * self.classifier.scale_factor # [N*Q,d] * [d, N] -> [N*Q, N]
 
             y_query = np.repeat(range(self.n_way), self.n_query)  # [0 0 0 1 1 1 2 2 2 3 3 3 4 4 4]
