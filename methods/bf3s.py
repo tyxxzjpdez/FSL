@@ -154,7 +154,7 @@ class Bf3s(MetaTemplate):
             prototype_weight = z_support / (torch.norm(z_support.mean(dim=1), p=2, dim=1, keepdim=True).expand_as(z_support) + eps)
             prototype_weight = prototype_weight.transpose(0,1)
             z_query = z_query.reshape(z_query.shape[0] * z_query.shape[1], -1) # [N*Q,d]
-            z_query = z_query / (torch.norm(z_query, p=2, dim=1, keepdim=True).expand_as(z_support) + eps)
+            z_query = z_query / (torch.norm(z_query, p=2, dim=1, keepdim=True).expand_as(z_query) + eps)
             scores = torch.mm(z_query, prototype_weight) * self.classifier.scale_factor # [N*Q,d] * [d, N] -> [N*Q, N]
 
             y_query = np.repeat(range(self.n_way), self.n_query)  # [0 0 0 1 1 1 2 2 2 3 3 3 4 4 4]
